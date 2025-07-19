@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Service Agent by SAP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/prism-js-fold@1.0.1/prism-js-fold.css">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 p-6">
+<div class="max-w-4xl mx-auto">
+    <!-- Tab Navigation -->
+    <div class="flex space-x-4 mb-6">
+        <button id="requestTab" class="px-4 py-2 bg-blue-500 text-white rounded">Request</button>
+        <button id="statusTab" class="px-4 py-2 bg-gray-300 rounded">Status</button>
+    </div>
+
+    <!-- Title Sections -->
+    <div class="title-div bg-white p-2" id="requestTitleDiv">
+        <h1 class="text-2xl font-bold w-full m-0 p-0 request-title text-left ml-4">Service Agent by SAP</h1>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex">
+        <!-- Request Form -->
+        <div id="requestPage" class="bg-gray-200 p-6 rounded shadow flex-1">
+            <form id="requestForm" class="space-y-4">
+                <!-- Name Input -->
+                <div>
+                    <h2 class="text-lg font-bold mb-2">Name</h2>
+                    <input type="text" name="name" class="w-1/2 p-2 border rounded" placeholder="Enter Name" required>
+                </div>
+
+                <!-- API Details -->
+                <div class="flex space-x-4">
+                    <div class="w-1/2">
+                        <div>
+                            <h2 class="text-lg font-bold mb-2">API Details</h2>
+                            <div class="flex space-x-2">
+                                <select name="method" class="p-2 border rounded" required>
+                                    <option value="GET">Get</option>
+                                    <option value="POST">Post</option>
+                                    <option value="PUT">Put</option>
+                                    <option value="DELETE">Delete</option>
+                                </select>
+                                <input type="text" name="apiUrl" class="w-full p-2 border rounded"
+                                       placeholder="Endpoint" required
+                                       pattern="^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}([/?#][^\s]*)?$"
+                                       title="Please enter a valid URL (e.g., http://example.com/api/test)">
+                            </div>
+                        </div>
+
+                        <!-- Headers Table -->
+                        <div class="mt-4 flex flex-col flex-1 text-left">
+                            <h2 class="text-lg font-bold mb-2">Headers</h2>
+                            <table class="w-full border-collapse">
+                                <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="p-2 text-left"><h3 class="text-base font-bold">Key</h3></th>
+                                    <th class="p-2 text-left"><h3 class="text-base font-bold">Value</h3></th>
+                                </tr>
+                                </thead>
+                                <tbody id="headerInfos" class="flex-1">
+                                <tr>
+                                    <td><input type="text" name="key" class="w-full p-2"
+                                               placeholder="Enter Key"></td>
+                                    <td><input type="text" name="value" class="w-full p-2"
+                                               placeholder="Enter Value"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" id="addHeader"
+                                    class="mt-2 px-4 py-2 border-2 border-blue-500 text-blue-500 bg-white rounded w-28"
+                                    style="white-space: nowrap">+ Add Row
+                            </button>
+                        </div>
+
+                        <!-- Execution Options -->
+                        <div id="executionSection" class="mt-4 flex-1">
+                            <h2 class="text-lg font-bold mb-2">Execution</h2>
+                            <div class="block">
+                                <label class="block mb-2">
+                                    <input type="radio" name="executionType" value="now" checked class="ml-2" required>
+                                    <h3 class="text-base font-bold inline">Execute now</h3>
+                                </label>
+                                <label class="block mb-2">
+                                    <input type="radio" name="executionType" value="schedule" class="ml-2" required>
+                                    <h3 class="text-base font-bold inline">Schedule</h3>
+                                </label>
+                            </div>
+                            <div id="scheduleFields" class="mt-2 flex space-x-4 hidden">
+                                <div>
+                                    <label class="block text-sm font-medium">Date</label>
+                                    <input type="date" name="scheduleDate" class="p-2 border rounded w-full">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium">Time</label>
+                                    <div class="flex space-x-2">
+                                        <input type="number" name="scheduleHour" min="0" max="23"
+                                               class="p-2 border rounded w-16" placeholder="HH">
+                                        <span class="pt-2">:</span>
+                                        <input type="number" name="scheduleMinute" min="0" max="59"
+                                               class="p-2 border rounded w-16" placeholder="MM">
+                                        <span class="pt-2">:</span>
+                                        <input type="number" name="scheduleSecond" min="0" max="59"
+                                               class="p-2 border rounded w-16" placeholder="SS">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Request Body -->
+                    <div class="w-1/2 flex flex-col justify-between">
+                        <div>
+                            <h2 class="text-lg font-bold mb-2">Body</h2>
+                            <div class="code-block">
+                                <pre class="line-numbers"><code class="language-json editable-code focus:outline-none"
+                                                                contenteditable="true"></code></pre>
+                                <textarea name="body" class="hidden" id="bodyInput"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" id="submitButton" class="mt-2 px-4 py-2 bg-blue-900 text-white rounded">
+                        Submit
+                    </button>
+                </div>
+
+                <!-- Response Section -->
+                <div class="mt-4">
+                    <h2 class="text-lg font-bold mb-2">Response</h2>
+                    <div class="flex space-x-4">
+                        <div class="w-1/2">
+                            <h3 class="text-base font-bold mb-2">Body</h3>
+                            <div class="code-block">
+                                <pre class="line-numbers"><code class="language-json" id="responseBody"
+                                                                contenteditable="false"></code></pre>
+                            </div>
+                        </div>
+                        <div class="w-1/2">
+                            <h3 class="text-base font-bold mb-2">Headers</h3>
+                            <table id="responseHeaders" class="w-full border-collapse">
+                                <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="p-2 text-left">Key</th>
+                                    <th class="p-2 text-left">Value</th>
+                                </tr>
+                                </thead>
+                                <tbody id="responseHeadersBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Status Page -->
+        <div id="statusPage" class="bg-gray-200 p-6 rounded shadow flex-1 hidden">
+            <div class="flex justify-center mb-4">
+                <h3 class="text-xl font-medium text-center jobs-title" id="jobsTitleDiv">List of all jobs</h3>
+            </div>
+            <div class="flex justify-end mb-4">
+                <button id="showFavorites" class="px-4 py-2 text-blue-500 flex items-center favorite-btn">
+                    <span class="star mr-2">★</span>Show Favorites
+                </button>
+            </div>
+            <table class="w-full text-left">
+                <thead>
+                <tr class="bg-gray-100">
+                    <th class="p-2"></th>
+                    <th class="p-2">ID</th>
+                    <th class="p-2">Job Name</th>
+                    <th class="p-2">Submitted</th>
+                    <th class="p-2">Execution</th>
+                    <th class="p-2">Status</th>
+                    <th class="p-2"></th>
+                </tr>
+                </thead>
+                <tbody id="jobList">
+                </tbody>
+            </table>
+            <div class="mt-4 flex justify-end items-center space-x-16">
+                <div class="flex items-center space-x-2">
+                    <label class="text-gray-400">Records per page:</label>
+                    <select id="recordsPerPage" class="p-1 border rounded">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                    </select>
+                </div>
+                <span id="pageInfo" class="mx-2 text-gray-400">1-5 of 5</span>
+                <button id="prevPage" class="px-2 py-1 bg-gray-200 rounded"><</button>
+                <button id="nextPage" class="px-2 py-1 bg-gray-200 rounded">></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PrismJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<script src="https://unpkg.com/prismjs/plugins/keep-markup/prism-keep-markup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prism-js-fold@1.0.1/prism-js-fold.js"></script>
+
+<!-- App JS -->
+<script src="app.js"></script>
+</body>
+</html>
