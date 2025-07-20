@@ -1,7 +1,7 @@
 package com.example.serviceagent.service;
 
 import com.example.serviceagent.constants.JobConstant;
-import com.example.serviceagent.model.ApiResponse;
+import com.example.serviceagent.model.RestResponse;
 import com.example.serviceagent.model.HeaderInfo;
 import com.example.serviceagent.model.Job;
 import org.slf4j.Logger;
@@ -10,17 +10,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +32,7 @@ public class JobExecutionService {
         this.restTemplate = restTemplate;
     }
 
-    public ApiResponse executeJobNow(Job job) {
+    public RestResponse executeJobNow(Job job) {
         ResponseEntity<String> responseEntity = restTemplate.exchange(
                 job.getApiUrl(),
                 HttpMethod.valueOf(job.getMethod()),
@@ -49,7 +43,7 @@ public class JobExecutionService {
         responseEntity.getHeaders().forEach((key, value) -> {
             if (!value.isEmpty()) headerMap.put(key, value.get(0));
         });
-        return new ApiResponse(
+        return new RestResponse(
                 responseEntity.getBody(),
                 headerMap,
                 responseEntity.getStatusCodeValue(),

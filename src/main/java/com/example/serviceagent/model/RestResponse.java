@@ -2,20 +2,20 @@ package com.example.serviceagent.model;
 
 import java.util.Map;
 
-public class ApiResponse {
+public class RestResponse {
     private String body;
     private Map<String, String> headers;
     private int statusCode;
     private boolean success;
 
-    public ApiResponse(String body, Map<String, String> headers, int statusCode, boolean success) {
+    public RestResponse(String body, Map<String, String> headers, int statusCode, boolean success) {
         this.body = body;
         this.headers = headers;
         this.statusCode = statusCode;
         this.success = success;
     }
 
-    public ApiResponse() {
+    public RestResponse() {
 
     }
 
