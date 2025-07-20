@@ -93,6 +93,13 @@ function initApp() {
         requestPageElements.responseHeadersBody.innerHTML = '';
     }
 
+    function resetHeaderInfos() {
+        requestPageElements.headersTbody.innerHTML = `
+      <td><input type="text" name="key" class="w-full p-2" placeholder="Enter Key"></td>
+      <td><input type="text" name="value" class="w-full p-2" placeholder="Enter Value"></td>
+    `;
+    }
+
     // Handle execution type change (now/schedule)
     function handleExecutionTypeChange(radio) {
         const {scheduleFields, scheduleDate, scheduleHour, scheduleMinute, scheduleSecond} = requestPageElements;
@@ -236,7 +243,6 @@ function initApp() {
 
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-            clearResponse();
             if (executionType === 'now') {
                 const text = await res.text();
                 let formattedJson = text;
@@ -258,7 +264,8 @@ function initApp() {
             }
 
             requestForm.reset();
-
+            clearResponse();
+            resetHeaderInfos();
             // Reset contenteditable and scheduled fields
             if (requestPageElements.codeElement) {
                 requestPageElements.codeElement.textContent = '';
