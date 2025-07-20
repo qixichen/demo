@@ -65,7 +65,6 @@ The service will be available at:
 | DELETE | `/mock/api/echo` | Echo back DELETE request        |
 | POST   | `/jobs`          | Create a new job                |
 | GET    | `/jobs`          | Get all jobs                    |
-| GET    | `/jobs/{id}`     | Get job by ID                   |
 | PUT    | `/jobs/{id}`     | Update job by ID                |
 
 ---
