@@ -242,7 +242,7 @@ function initApp() {
             });
 
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
+            clearResponse();
             if (executionType === 'now') {
                 const text = await res.text();
                 let formattedJson = text;
@@ -264,7 +264,6 @@ function initApp() {
             }
 
             requestForm.reset();
-            clearResponse();
             resetHeaderInfos();
             // Reset contenteditable and scheduled fields
             if (requestPageElements.codeElement) {
