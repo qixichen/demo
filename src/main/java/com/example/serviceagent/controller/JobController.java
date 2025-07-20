@@ -64,21 +64,9 @@ public class JobController {
     public Page<Job> getAllJobs(
         @Parameter(description = "Page number") @RequestParam int page,
         @Parameter(description = "Number of items per page") @RequestParam int size,
-        @Parameter(description = "Filter by favorite status") @RequestParam(required = false) Boolean favorite) {
-        return jobService.findAll(PageRequest.of(page, size), favorite);
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "Get job by ID", description = "Returns a job with the given ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Job found", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = Job.class))
-        }),
-        @ApiResponse(responseCode = "404", description = "Job not found", content = @Content)
-    })
-    public Job getJobById(
-        @Parameter(description = "ID of the job to retrieve") @PathVariable Long id) {
-        return jobService.getJobById(id);
+        @Parameter(description = "Filter by favorite status") @RequestParam(required = false) Boolean favorite,
+        @Parameter(description = "Filter by the user id") @RequestParam String createdBy) {
+        return jobService.findAll(PageRequest.of(page, size), favorite,createdBy);
     }
 
     @PutMapping("/{id}")

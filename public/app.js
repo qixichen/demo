@@ -34,6 +34,12 @@ function initApp() {
     let recordsPerPage = 5;
     let showFavoritesOnly = false;
     let totalJobs = 0;
+    const userId = generateUserId();
+    console.log("Current User ID:", userId);
+
+    function generateUserId() {
+        return 'user-' + Math.random().toString(36).slice(2, 11);
+    }
 
     // Switch between Request and Status tab
     function switchTab(tab) {
@@ -217,7 +223,8 @@ function initApp() {
             executionTime: executionType === 'now' ? new Date().toISOString() : null,
             scheduledTime: scheduledTime,
             favorite: false,
-            executionType
+            executionType,
+            createdBy: userId
         };
 
         try {
@@ -242,14 +249,12 @@ function initApp() {
                 responseBody.textContent = formattedJson;
 
                 Prism.highlightAll();
-                const headers = [...res.headers].map(([key, value]) => `
+                responseHeadersBody.innerHTML = [...res.headers].map(([key, value]) => `
               <tr>
                 <td class="p-2 border border-gray-300">${key}</td>
                 <td class="p-2 border border-gray-300">${value}</td>
               </tr>
             `).join('');
-
-                responseHeadersBody.innerHTML = headers;
             }
 
             requestForm.reset();
@@ -265,6 +270,17 @@ function initApp() {
             }
 
             if (requestPageElements.scheduleFields) {
+                const {
+                    scheduleDate,
+                    scheduleHour,
+                    scheduleMinute,
+                    scheduleSecond
+                } = requestPageElements;
+
+                if (scheduleDate || scheduleHour || scheduleMinute || scheduleSecond) {
+                    const inputs = [scheduleDate, scheduleHour, scheduleMinute, scheduleSecond];
+                    disableFields(inputs)
+                }
                 requestPageElements.scheduleFields.classList.add('hidden');
             }
 
@@ -313,7 +329,7 @@ function initApp() {
 
     async function fetchJobs() {
         try {
-            const url = `/jobs?page=${currentPage - 1}&size=${recordsPerPage}&favorite=${showFavoritesOnly}`;
+            const url = `/jobs?page=${currentPage - 1}&size=${recordsPerPage}&favorite=${showFavoritesOnly}&createdBy=${userId}`;
             const res = await fetch(url, {method: 'GET', headers: {Accept: 'application/json'}});
             if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}, Text: ${res.statusText}`);
             const data = await res.json();
@@ -335,7 +351,7 @@ function initApp() {
             const row = document.createElement('tr');
             row.innerHTML = `
           <td class="p-2"><span class="star ${job.favorite ? 'filled' : 'unfilled'}" data-id="${job.id}">★</span></td>
-          <td class="p-2">${job.id || '-'}</td>
+          <td class="p-2">${job.createdBy || '-'}</td>
           <td class="p-2">${job.name || '-'}</td>
           <td class="p-2">${formatDate(job.submitted)}</td>
           <td class="p-2">${formatDate(job.executionTime)}</td>
@@ -380,8 +396,7 @@ function initApp() {
 
 
     function getStatusColorClass(status) {
-        if (status === 'COMPLETED') return 'text-green-500';
-        if (status === 'FAILED' || status === 'FAILED_WITH_FALLBACK') return 'text-red-500';
+        if (status === 'Completed') return 'text-green-500';
         return 'text-orange-500';
     }
 
@@ -409,11 +424,10 @@ function initApp() {
                 const job = jobs.find(j => j.id === id);
                 if (job) {
                     const newFavoriteStatus = !job.favorite;
-                    job.favorite = newFavoriteStatus;
                     fetch(`/jobs/${id}`, {
                         method: 'PUT',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({favorite: newFavoriteStatus})
+                        body: JSON.stringify({favorite: newFavoriteStatus, createdBy: userId})
                     })
                         .then(res => {
                             if (!res.ok) throw new Error('Failed to update favorite');
@@ -422,7 +436,6 @@ function initApp() {
                         })
                         .catch(err => {
                             console.error('[Update Favorite Error]', err);
-                            job.favorite = !newFavoriteStatus;
                             fetchAndRenderJobs();
                         });
                 }

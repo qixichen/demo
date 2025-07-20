@@ -1,8 +1,5 @@
 package com.example.serviceagent.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,10 +7,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,13 +70,6 @@ public class MockAPIController {
     }
 
     private ResponseEntity<Map<String, Object>> echoRequest(HttpServletRequest request) throws IOException {
-        Map<String, String> headerMap = new HashMap<>();
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            headerMap.put(headerName, request.getHeader(headerName));
-        }
-
         StringBuilder bodyBuilder = new StringBuilder();
         try (BufferedReader reader = request.getReader()) {
             String line;
@@ -88,7 +80,6 @@ public class MockAPIController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("method", request.getMethod());
-        response.put("headers", headerMap);
         response.put("body", bodyBuilder.toString());
 
         return ResponseEntity.ok(response);

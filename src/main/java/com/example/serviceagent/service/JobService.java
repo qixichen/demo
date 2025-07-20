@@ -21,20 +21,21 @@ public class JobService {
         this.jobRepository = jobRepository;
     }
 
-    public Job createJob(Job job) {
-        return jobRepository.save(job);
+    public void createJob(Job job) {
+        jobRepository.save(job);
     }
 
-    public Job getJobById(Long id) {
-        return jobRepository.findById(id).orElse(null);
+    public Job getJobById(Long id, String createdBy) {
+        return jobRepository.findByIdAndCreatedBy(id, createdBy).orElse(null);
     }
 
-    public Page<Job> findAll(PageRequest pageable, Boolean favorite) {
-        Specification<Job> spec = (root, query, criteriaBuilder) -> {
+    public Page<Job> findAll(PageRequest pageable, Boolean favorite, String createdBy) {
+        Specification<Job> spec = (root, _, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (favorite != null) {
                 predicates.add(criteriaBuilder.equal(root.get("favorite"), favorite));
             }
+            predicates.add(criteriaBuilder.equal(root.get("createdBy"), createdBy));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
         return jobRepository.findAll(spec, pageable);
@@ -45,19 +46,18 @@ public class JobService {
         return jobRepository.findByStatusAndScheduledTimeBefore(status, time);
     }
 
-    public List<Job> findByTag(boolean favorite) {
-        return jobRepository.findByFavorite(favorite);
-    }
 
     public Job updateJob(Long id, Job job) {
-        Job existingJob = getJobById(id);
+        Job existingJob = getJobById(id, job.getCreatedBy());
         if (existingJob != null) {
             if (job.isFavorite() != null) {
-
                 existingJob.setFavorite(job.isFavorite());
             }
             if (job.getStatus() != null) {
                 existingJob.setStatus(job.getStatus());
+            }
+            if (job.getExecutionTime() != null) {
+                existingJob.setExecutionTime(job.getExecutionTime());
             }
             return jobRepository.save(existingJob);
         }

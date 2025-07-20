@@ -6,5 +6,4 @@ public final class JobConstant {
 
     public static final String STATUS_SCHEDULED = "Scheduled";
     public static final String STATUS_COMPLETED = "Completed";
-    public static final String STATUS_FAILED = "Failed";
 }
