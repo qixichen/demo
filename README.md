@@ -14,7 +14,7 @@ A simple Spring Boot service for mocking API requests and managing jobs.
 
 ## 🛠 Tech Stack
 
-- Java 17+
+- Java 23+
 - Spring Boot 3.x
 - Spring Web
 - Springdoc OpenAPI (Swagger 3)
