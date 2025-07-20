@@ -66,10 +66,10 @@ public class JobExecutionService {
         for (Job job : scheduledJobs) {
             try {
                 executeJobNow(job);
-                job.setStatus(JobConstant.STATUS_COMPLETED);
             } catch (Exception e) {
-                job.setStatus(JobConstant.STATUS_FAILED);
+                logger.error("Error executing job: {}", job.getName(), e);
             }
+            job.setStatus(JobConstant.STATUS_COMPLETED);
             job.setExecutionTime(now);
             jobService.updateJob(job.getId(), job);
         }

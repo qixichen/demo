@@ -5,6 +5,8 @@ import com.example.serviceagent.model.ApiResponse;
 import com.example.serviceagent.model.Job;
 import com.example.serviceagent.service.JobExecutionService;
 import com.example.serviceagent.service.JobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/jobs")
 public class JobController {
-
+    private static final Logger logger = LoggerFactory.getLogger(JobController.class);
     private final JobService jobService;
     private final JobExecutionService jobExecutionService;
 
@@ -27,10 +29,10 @@ public class JobController {
         if (job.getExecutionTime() != null) {
             try {
                 apiResponse = jobExecutionService.executeJobNow(job);
-                job.setStatus(JobConstant.STATUS_COMPLETED);
             } catch (Exception e) {
-                job.setStatus(JobConstant.STATUS_FAILED);
+                logger.error("Error executing job: {}", job.getName(), e);
             }
+            job.setStatus(JobConstant.STATUS_COMPLETED);
         } else {
             job.setStatus(JobConstant.STATUS_SCHEDULED);
         }
