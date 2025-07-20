@@ -4,8 +4,9 @@ A simple Spring Boot service for mocking API requests and managing jobs.
 
 ---
 ## Demo
-
-https://go.screenpal.com/watch/cTiYj5nIVNV
+<video width="100%" height="100%" controls>
+  <source src="https://go.screenpal.com/watch/cTiYj5nIVNV" type="video/mp4">
+</video>
 
 ---
 
